@@ -20,9 +20,9 @@ rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 
 cp "$binary" "$app/Contents/MacOS/keynortia"
-# the licences of the fonts built into the program, next to the program
+# the licences of the libraries and the fonts built into the program, next to the program
 mkdir -p "$app/Contents/Resources/licenses"
-cp assets/fonts/OFL-*.txt "$app/Contents/Resources/licenses/"
+cp THIRD-PARTY-LICENSES.md assets/fonts/OFL-*.txt "$app/Contents/Resources/licenses/"
 chmod 755 "$app/Contents/MacOS/keynortia"
 sed "s/@VERSION@/$version/g" packaging/macos/Info.plist > "$app/Contents/Info.plist"
 

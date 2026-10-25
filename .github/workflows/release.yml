@@ -71,7 +71,7 @@ jobs:
 
           name="keynortia-$VERSION-linux-${{ matrix.arch }}"
           mkdir "dist/$name"
-          cp target/release/keynortia LICENSE README.md packaging/keynortia.desktop "dist/$name/"
+          cp target/release/keynortia LICENSE THIRD-PARTY-LICENSES.md README.md packaging/keynortia.desktop "dist/$name/"
           cp assets/icon.png "dist/$name/keynortia.png"
           mkdir "dist/$name/licenses"
           cp assets/fonts/OFL-*.txt "dist/$name/licenses/"
@@ -140,7 +140,7 @@ jobs:
         run: |
           $name = "keynortia-$env:VERSION-windows-x86_64"
           New-Item -ItemType Directory -Path "dist/$name/licenses" | Out-Null
-          Copy-Item target/release/keynortia.exe, LICENSE, README.md -Destination "dist/$name"
+          Copy-Item target/release/keynortia.exe, LICENSE, THIRD-PARTY-LICENSES.md, README.md -Destination "dist/$name"
           Copy-Item assets/fonts/OFL-*.txt -Destination "dist/$name/licenses"
           Compress-Archive -Path "dist/$name" -DestinationPath "dist/$name.zip"
           Remove-Item -Recurse "dist/$name"

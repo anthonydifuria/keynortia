@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#090908">
+<title>Keynortia · Turn your computer keyboard into a MIDI instrument</title>
+<meta name="description" content="Keynortia turns your computer keyboard into a MIDI instrument: a piano or a button accordion on the small keys, for Linux, Windows and macOS. Free and open source.">
+<link rel="canonical" href="https://anthonydifuria.github.io/keynortia/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Keynortia">
+<meta property="og:title" content="Keynortia">
+<meta property="og:description" content="Turn your computer keyboard into a MIDI instrument: a piano or a button accordion on the small keys. Linux, Windows and macOS. Free and open source.">
+<meta property="og:url" content="https://anthonydifuria.github.io/keynortia/">
+<meta property="og:image" content="https://anthonydifuria.github.io/keynortia/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Keynortia logo: a goddess crowned with nails, holding a hammer">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="64x64" href="img/icon-64.png">
+<link rel="apple-touch-icon" href="img/icon-180.png">
+<link rel="stylesheet" href="style.css">
+<script src="layout.js" defer></script>
+<script src="synth.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="brand" href="#top">Keynortia</a>
+    <nav aria-label="Sections">
+      <a href="#play">Play</a>
+      <a href="#install">Install</a>
+      <a href="#start">Quick start</a>
+      <a href="#privacy">Privacy</a>
+      <a href="https://github.com/anthonydifuria/keynortia">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="top">
+    <h1 class="logo-wrap"><img class="logo" src="img/logo.webp" width="783" height="611" alt="Keynortia"></h1>
+    <div class="hero-text">
+      <span class="etr" lang="ett" aria-hidden="true">𐌊𐌄𐌖𐌍𐌏𐌓𐌕𐌉𐌀</span>
+      <p class="lead">Turn your computer keyboard into a MIDI instrument.</p>
+      <p>A piano or a button accordion on the small keys, with a different instrument for every keyboard. Keynortia sends MIDI notes to any synthesizer, sampler, plugdata patch or DAW you like, exactly as if you were playing a MIDI keyboard.</p>
+      <p class="tagline">One keystroke at a time. One note at a time. Fate is in your hands.</p>
+      <p class="cta">
+        <a class="btn btn-primary" id="dl" href="https://github.com/anthonydifuria/keynortia/releases/latest">Download</a>
+        <a class="btn" href="https://github.com/anthonydifuria/keynortia">View on GitHub</a>
+      </p>
+      <p class="small">Linux, Windows and macOS. Free and open source, MIT license.</p>
+    </div>
+  </section>
+
+  <div class="rule" aria-hidden="true"><svg viewBox="0 0 14 30" width="14" height="30"><path d="M1 2.5h12M7 2.5v19" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 21.5h4L7 29z" fill="currentColor"/></svg></div>
+
+  <section id="play">
+    <h2 class="sec">Try it here</h2>
+    <p>Your keyboard is the instrument. Press keys on the digits, QWERTY, ASDF and ZXCV rows, or click the keys below. If nothing happens, click the page once first.</p>
+
+    <div class="pane">
+      <span class="tab" id="pane-tab">On-screen keyboard · Piano</span>
+
+      <div class="ctl">
+        <div class="grp" role="radiogroup" aria-label="Instrument">
+          <span class="lbl">Instrument</span>
+          <span class="seg">
+            <button type="button" role="radio" aria-checked="true" data-inst="piano" title="Piano">Piano</button>
+            <button type="button" role="radio" aria-checked="false" data-inst="accB" title="Button accordion (B system)">Accordion B</button>
+            <button type="button" role="radio" aria-checked="false" data-inst="accC" title="Button accordion (C system)">Accordion C</button>
+          </span>
+        </div>
+        <div class="grp">
+          <span class="lbl">Octave</span>
+          <button type="button" class="br" id="oct-down" aria-label="Octave down">[ - ]</button>
+          <output id="oct-val" class="val">0</output>
+          <button type="button" class="br" id="oct-up" aria-label="Octave up">[ + ]</button>
+        </div>
+        <div class="grp" role="radiogroup" aria-label="Note names">
+          <span class="lbl">Note names</span>
+          <span class="seg">
+            <button type="button" role="radio" aria-checked="true" data-names="solfege">Do Re Mi</button>
+            <button type="button" role="radio" aria-checked="false" data-names="letters">C D E</button>
+          </span>
+        </div>
+      </div>
+
+      <div class="ctl ctl-play">
+        <button type="button" class="br" id="listen" role="switch" aria-checked="true"><span id="listen-box">[x]</span> Use my keyboard</button>
+        <span id="status" class="status on">● listening</span>
+        <span class="readout"><span class="lbl">Playing</span> <span id="readout">—</span></span>
+      </div>
+
+      <div class="board" id="board" role="group" aria-label="On-screen keyboard"></div>
+      <noscript><p class="cap">The keyboard needs JavaScript to play.</p></noscript>
+
+      <p class="cap" id="cap"></p>
+      <p class="cap warn" id="audio-note" hidden>Your browser is holding the sound back. Click or tap the page once and play again.</p>
+    </div>
+
+    <p class="small">The sound here comes from a small synthesizer built into this page. The program itself makes no sound: it sends MIDI notes to the synthesizer you choose. Keys are identified by position, not by the letter printed on them, so the layouts are the same on AZERTY, QWERTZ or Dvorak.</p>
+  </section>
+
+  <section id="features">
+    <h2 class="sec">What it does</h2>
+    <ul class="feat">
+      <li><b>Two instruments, three layouts</b><span>A piano, and a chromatic button accordion in the B system or the C system. The layouts are fixed, on the 45 small keys of the four main rows.</span></li>
+      <li><b>One instrument per keyboard</b><span>Play the piano on your laptop and the accordion on a USB keyboard, at the same time. Every keyboard is told apart from the others.</span></li>
+      <li><b>Exclusive mode</b><span>While a keyboard is an instrument its keys only play. They no longer type in any other program.</span></li>
+      <li><b>Position, not letters</b><span>Keys are identified by where they are, so the layouts are the same on QWERTY, AZERTY, QWERTZ, Dvorak and so on.</span></li>
+      <li><b>Plays in the background</b><span>Keep a DAW or plugdata in front and play. A Bluetooth keyboard that sleeps and wakes up starts playing again without a click.</span></li>
+      <li><b>MIDI out</b><span>A virtual port called Keynortia on Linux and macOS, or any MIDI port that already exists. On Windows that means loopMIDI or the Microsoft GS Wavetable Synth.</span></li>
+      <li><b>On-screen keyboard</b><span>It lights up the keys you press, with the name of every note (Do Re Mi or C D E). Octave shift, velocity and MIDI channel are there too.</span></li>
+      <li><b>One small native program</b><span>Written in Rust, with a terminal-inspired look in the Etruscan style. It never connects to the internet.</span></li>
+    </ul>
+  </section>
+
+  <section id="program">
+    <h2 class="sec">The program</h2>
+    <div class="shots">
+      <figure class="pane">
+        <span class="tab">Piano</span>
+        <img src="img/screenshot-piano.webp" width="1000" height="860" alt="Keynortia with the piano layout: an external keyboard is listening and its pressed keys are lit on the on-screen keyboard">
+      </figure>
+      <figure class="pane">
+        <span class="tab">Button accordion · B system</span>
+        <img src="img/screenshot-accordion.webp" width="1000" height="860" alt="Keynortia with the button accordion layout, B system: sharps in dark keys, the Cs in bronze">
+      </figure>
+    </div>
+    <p class="small">The keyboards in the screenshots are made up.</p>
+  </section>
+
+  <section id="install">
+    <h2 class="sec">Install</h2>
+    <p>Download the file for your system from the <a href="https://github.com/anthonydifuria/keynortia/releases/latest">Releases page</a>. <code>SHA256SUMS</code> has the checksum of each file.</p>
+
+    <div class="oslist">
+      <div class="osgroup" data-os="linux">
+      <h3 class="osgroup-title">Linux</h3>
+      <div class="os">
+        <h3>Ubuntu, Debian, Linux Mint, Pop!_OS…</h3>
+        <div>
+          <p class="file">keynortia_&lt;version&gt;-1_amd64.deb <span>(arm64 on ARM)</span></p>
+          <div class="cmd"><code>sudo apt install ./keynortia_*_amd64.deb</code><button type="button" class="copy">copy</button></div>
+        </div>
+      </div>
+      <div class="os">
+        <h3>Fedora, RHEL, openSUSE…</h3>
+        <div>
+          <p class="file">keynortia-&lt;version&gt;-1.x86_64.rpm <span>(aarch64 on ARM)</span></p>
+          <div class="cmd"><code>sudo dnf install ./keynortia-*.x86_64.rpm</code><button type="button" class="copy">copy</button></div>
+        </div>
+      </div>
+      <div class="os">
+        <h3>Arch Linux, Manjaro, EndeavourOS…</h3>
+        <div>
+          <p class="file">keynortia-&lt;version&gt;-1-x86_64.pkg.tar.zst</p>
+          <div class="cmd"><code>sudo pacman -U keynortia-*-x86_64.pkg.tar.zst</code><button type="button" class="copy">copy</button></div>
+        </div>
+      </div>
+      <div class="os">
+        <h3>Any other Linux</h3>
+        <div>
+          <p class="file">keynortia-&lt;version&gt;-linux-x86_64.tar.gz <span>(aarch64 on ARM)</span></p>
+          <div class="cmd"><code>tar xf keynortia-*-linux-x86_64.tar.gz &amp;&amp; cd keynortia-*-linux-x86_64 &amp;&amp; ./keynortia</code><button type="button" class="copy">copy</button></div>
+        </div>
+      </div>
+      </div>
+      <div class="os" data-os="windows">
+        <h3>Windows 10 and 11</h3>
+        <div>
+          <p class="file">keynortia-&lt;version&gt;-windows-x86_64.zip</p>
+          <p class="how">Extract the zip anywhere and double-click <code>keynortia.exe</code>. Windows may say <i>“Windows protected your PC”</i>, because the program is not code-signed: click <b>More info</b>, then <b>Run anyway</b>.</p>
+        </div>
+      </div>
+      <div class="os" data-os="macos">
+        <h3>macOS 11 or later</h3>
+        <div>
+          <p class="file">Keynortia-&lt;version&gt;-macos.dmg <span>(Apple silicon and Intel)</span></p>
+          <p class="how">Open the .dmg and drag <b>Keynortia</b> onto <b>Applications</b>. The first time, macOS blocks apps that are not notarized: open <b>System Settings → Privacy &amp; Security</b> and click <b>Open Anyway</b>. When you switch a keyboard on, allow <b>Input Monitoring</b>.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub">One thing to do once on Linux</h3>
+    <p>Linux keeps the input devices for members of the <code>input</code> group. Add yourself to it, then log out and back in (or reboot). If you forget, Keynortia tells you, with this very command, when you start it.</p>
+    <div class="cmd cmd-wide"><code>sudo usermod -aG input $USER</code><button type="button" class="copy">copy</button></div>
+
+    <h3 class="sub">Hearing it</h3>
+    <p>Keynortia sends MIDI. A synthesizer makes the sound. Pick the <b>Output</b> in the program, then press <b>Test note</b>: you should hear a middle C.</p>
+    <ul class="plain">
+      <li><b>Linux:</b> Keynortia opens a virtual port called <code>Keynortia</code>. Pick your synthesizer's port in the Output list, or connect the virtual port to it with your DAW, <code>qpwgraph</code> or <code>aconnect</code>. FluidSynth with a General MIDI soundfont is a quick one to try.</li>
+      <li><b>Windows:</b> leave the Output on <b>Microsoft GS Wavetable Synth</b> for a first test. To reach another program, install the free <a href="https://www.tobias-erichsen.de/software/loopmidi.html">loopMIDI</a>, create a port, and enable the same port in that program.</li>
+      <li><b>macOS:</b> start Keynortia first, then enable <code>Keynortia</code> among the MIDI inputs of the program that makes the sound.</li>
+    </ul>
+
+    <h3 class="sub">Status</h3>
+    <p>Keynortia is at version 0.1. Linux is the main platform and the one that has been tried on real keyboards. Windows and macOS are new: they are built and tested automatically on every change, but they have seen little use on real machines, above all the exclusive mode. If something does not work, please <a href="https://github.com/anthonydifuria/keynortia/issues">open an issue</a> and say which system, which keyboard and what the window says.</p>
+    <div class="tablewrap">
+      <table class="plat">
+        <thead><tr><th scope="col"></th><th scope="col">Linux</th><th scope="col">Windows</th><th scope="col">macOS</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Tells the keyboards apart</th><td>yes</td><td>yes</td><td>yes</td></tr>
+          <tr><th scope="row">Exclusive mode</th><td>yes, always</td><td>yes, with a keyboard hook</td><td>best effort: macOS may refuse</td></tr>
+          <tr><th scope="row">Virtual MIDI port</th><td>yes</td><td>no, use loopMIDI</td><td>yes</td></tr>
+          <tr><th scope="row">Set up once</th><td>join the <code>input</code> group</td><td>loopMIDI, to reach other programs</td><td>allow Input Monitoring</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="start">
+    <h2 class="sec">Quick start</h2>
+    <ol class="steps">
+      <li><div><b>Start Keynortia.</b> The window has three parts: the MIDI settings at the top, the list of your keyboards, and the on-screen keyboard at the bottom.</div></li>
+      <li><div><b>Make sure something is listening.</b> Press <b>Test note</b>. You should hear a middle C.</div></li>
+      <li><div><b>Tick “Use as instrument”</b> on the keyboard you want to play. An external keyboard is the comfortable choice: the keys of the keyboard you switch on stop typing.</div></li>
+      <li><div><b>Pick the instrument:</b> Piano, or Button accordion in the B or the C system.</div></li>
+      <li><div><b>Play</b> on the digits, QWERTY, ASDF and ZXCV rows. The on-screen keyboard shows the note of every key. To stop, untick “Use as instrument” with the mouse. Closing the window frees the keyboards too.</div></li>
+    </ol>
+    <p class="callout"><b>If your only keyboard is the one you are playing,</b> keep the mouse at hand. With Exclusive on, the keys of that keyboard cannot type anything else. Untick “Use as instrument”, or close the window, and it types again.</p>
+  </section>
+
+  <section id="privacy">
+    <h2 class="sec">What it looks at</h2>
+    <p>A program that reads keys should say what it does with them.</p>
+    <ul class="feat">
+      <li><b>No networking code</b><span>Keynortia never connects to the internet and sends nothing anywhere.</span></li>
+      <li><b>Keys become notes, nothing else</b><span>It keeps no log and writes nothing to disk, apart from the keyd configuration if you ask it to free a keyboard on Linux.</span></li>
+      <li><b>Only the keyboards you switch on</b><span>It acts on those keyboards only, and only on their 45 small keys. Everything else you type passes through untouched. The details for each system are in the <a href="https://github.com/anthonydifuria/keynortia#privacy-and-security">manual</a>.</span></li>
+      <li><b>Open source, built in the open</b><span>The releases are built by GitHub Actions from the tagged source, and <code>SHA256SUMS</code> lets you check the files you downloaded.</span></li>
+    </ul>
+  </section>
+
+  <section id="name">
+    <h2 class="sec">About the name</h2>
+    <div class="name-grid">
+      <div>
+        <p>Keynortia is inspired by <b>Nortia</b>, an Etruscan goddess of fate and fortune: it turns every keystroke into a note, weaving your own musical destiny.</p>
+        <p>The Roman historian Livy, on the word of the antiquarian Cincius, tells that nails were fixed in her temple at Volsinii to mark the number of the years<sup><a href="#src-1" aria-label="Source 1">1</a></sup>. Reference works add that a nail was driven into the temple wall every year<sup><a href="#src-2" aria-label="Source 2">2</a>,<a href="#src-3" aria-label="Source 3">3</a></sup>. The nails and the hammer of the logo recall them. The title of the program's window is written in Etruscan letters (the Old Italic alphabet) as well as in plain ones, one letter for each of ours<sup><a href="#src-4" aria-label="Source 4">4</a></sup>.</p>
+      </div>
+      <figure class="etr-big">
+        <div lang="ett" aria-hidden="true">𐌊𐌄𐌖𐌍𐌏𐌓𐌕𐌉𐌀</div>
+        <figcaption>Keynortia in Old Italic letters, one for each of ours.</figcaption>
+      </figure>
+    </div>
+    <ol class="sources" aria-label="Sources">
+      <li id="src-1">Livy, <i>Ab Urbe Condita</i> 7.3.7, English translation by Canon Roberts (1912): <a href="https://cts.perseids.org/read/latinLit/phi0914/phi001/perseus-eng3/7.3.3-7.3.9">Perseids</a>.</li>
+      <li id="src-2">William Smith (ed.), <i>A Dictionary of Greek and Roman Biography and Mythology</i>, entry <i>Nortia</i>: <a href="https://cts.perseids.org/read/pdlrefwk/viaf88890045/003/perseus-eng1/N.nortia_1">Perseids</a>.</li>
+      <li id="src-3"><a href="https://en.wikipedia.org/wiki/Nortia">Nortia</a> on Wikipedia, which lists the ancient sources and the modern studies.</li>
+      <li id="src-4"><a href="https://en.wikipedia.org/wiki/Etruscan_alphabet">Etruscan alphabet</a> on Wikipedia. Keynortia is a modern name, so its Etruscan letters are a transliteration, not a spelling an Etruscan would have used.</li>
+    </ol>
+  </section>
+
+  <footer class="foot">
+    <div class="rule" aria-hidden="true"><svg viewBox="0 0 14 30" width="14" height="30"><path d="M1 2.5h12M7 2.5v19" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 21.5h4L7 29z" fill="currentColor"/></svg></div>
+    <p>Keynortia is free software under the <a href="https://github.com/anthonydifuria/keynortia/blob/main/LICENSE">MIT License</a>. The libraries and fonts it is made with, and their licenses, are listed in <a href="https://github.com/anthonydifuria/keynortia/blob/main/THIRD-PARTY-LICENSES.md">THIRD-PARTY-LICENSES.md</a>.</p>
+    <p class="links"><a href="https://github.com/anthonydifuria/keynortia">Source</a><a href="https://github.com/anthonydifuria/keynortia/releases">Releases</a><a href="https://github.com/anthonydifuria/keynortia#manual">Manual</a><a href="https://github.com/anthonydifuria/keynortia/issues">Issues</a><a href="https://github.com/anthonydifuria/keynortia/blob/main/THIRD-PARTY-LICENSES.md">Licenses</a></p>
+    <p class="small">This page is set in Cinzel, IBM Plex Mono and Noto Sans Old Italic, the same fonts as the program, under the <a href="https://github.com/anthonydifuria/keynortia/tree/main/assets/fonts">SIL Open Font License 1.1</a>. Apart from those fonts the page uses no code or files from other projects: the sound, the layouts and the page itself were written for it.</p>
+  </footer>
+
+</div>
+</body>
+</html>

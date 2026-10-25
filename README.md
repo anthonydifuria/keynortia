@@ -19,6 +19,12 @@
 </p>
 
 <p align="center">
+  <a href="https://anthonydifuria.github.io/keynortia/">Website</a> ·
+  <a href="https://github.com/anthonydifuria/keynortia/releases/latest">Download</a> ·
+  <a href="#manual">Manual</a>
+</p>
+
+<p align="center">
   <img src="assets/screenshot-piano.png" alt="Keynortia with the piano layout: an external keyboard is listening and its pressed keys are lit on the on-screen keyboard" width="49%">
   <img src="assets/screenshot-accordion.png" alt="Keynortia with the button accordion layout (B system)" width="49%">
 </p>
@@ -550,7 +556,9 @@ To make the packages yourself, after `cargo build --release`: `cargo install car
 For the maintainer. A release is made by pushing a tag:
 
 1. Set the new `version` in `Cargo.toml` (and `pkgver` in `packaging/arch/PKGBUILD`, which the release workflow
-   replaces anyway but the AUR needs right), and commit.
+   replaces anyway but the AUR needs right). If the libraries changed (`Cargo.lock`), write the list of licenses
+   again with `python3 packaging/licenses/generate.py` (it needs Python 3.11 or later; `--check` only checks it).
+   Commit.
 2. Tag it and push the tag. The tag must be `v` plus the version:
    ```sh
    git tag v0.1.0
@@ -574,23 +582,39 @@ run `updpkgsums` and `makepkg --printsrcinfo > .SRCINFO`, check that `makepkg -s
 Keynortia is inspired by **Nortia**, an Etruscan goddess of fate and fortune: it turns every keystroke into a note,
 weaving your own musical destiny.
 
-Roman writers tell that nails were fixed in the wall of her temple at Volsinii, one for each year. The nails and the
-hammer of the logo recall them, and the title of the window is written in Etruscan letters (the Old Italic alphabet)
-as well as in plain ones.
+The Roman historian Livy, on the word of the antiquarian Cincius, tells that nails were fixed in her temple at
+Volsinii to mark the number of the years [1]. Reference works add that a nail was driven into the temple wall every
+year [2][3]. The nails and the hammer of the logo recall them. The title of the window is written in Etruscan letters
+(the Old Italic alphabet) as well as in plain ones, one letter for each of ours [4].
 
 > One keystroke at a time. One note at a time. Fate is in your hands.
+
+Sources:
+
+1. Livy, *Ab Urbe Condita* 7.3.7, in the English translation by Canon Roberts (1912):
+   [Perseids](https://cts.perseids.org/read/latinLit/phi0914/phi001/perseus-eng3/7.3.3-7.3.9).
+2. William Smith (ed.), *A Dictionary of Greek and Roman Biography and Mythology*, entry *Nortia*:
+   [Perseids](https://cts.perseids.org/read/pdlrefwk/viaf88890045/003/perseus-eng1/N.nortia_1).
+3. [Nortia](https://en.wikipedia.org/wiki/Nortia) on Wikipedia, which lists the ancient sources and the modern studies.
+4. [Etruscan alphabet](https://en.wikipedia.org/wiki/Etruscan_alphabet) on Wikipedia. Keynortia is a modern name, so
+   its Etruscan letters are a transliteration, not a spelling an Etruscan would have used.
 
 ## Credits and licenses
 
 Keynortia is released under the [MIT License](LICENSE).
 
-The program contains these fonts, under the [SIL Open Font License 1.1](https://openfontlicense.org); the text of the
-license of each one is in [`assets/fonts`](assets/fonts) and comes with every download:
+It is built with open-source libraries and contains three fonts.
+[`THIRD-PARTY-LICENSES.md`](THIRD-PARTY-LICENSES.md) lists every one of them with its version, its license and a link
+to where it lives, and gives the full text of each license. It comes with every download.
+
+The fonts are under the [SIL Open Font License 1.1](https://openfontlicense.org); the text of the license of each one
+is also in [`assets/fonts`](assets/fonts):
 
 - **IBM Plex Mono**, for the text of the interface
 - **Cinzel**, for the title
 - **Noto Sans Old Italic**, for the Etruscan letters
 
-It is built on [egui and eframe](https://github.com/emilk/egui), [midir](https://github.com/Boddlnagg/midir),
-[evdev](https://github.com/emberian/evdev), [windows-sys](https://github.com/microsoft/windows-rs) and
+The main libraries are [egui and eframe](https://github.com/emilk/egui), [midir](https://github.com/Boddlnagg/midir),
+[evdev](https://github.com/emberian/evdev), [libc](https://github.com/rust-lang/libc),
+[windows-sys](https://github.com/microsoft/windows-rs) and
 [core-foundation](https://github.com/servo/core-foundation-rs): thanks to everyone who works on them.

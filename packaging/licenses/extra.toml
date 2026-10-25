@@ -1,0 +1,102 @@
+# What generate.py cannot find by itself.
+#
+# generate.py reads the license files that each library ships in its published package. This file lists
+# the exceptions: libraries whose package has no license file (the text is then taken from the source
+# repository and kept unchanged in upstream/), and a few notes and choices. Paths are relative to this folder.
+#
+# A library is written as "name" (every version) or "name@version".
+
+# ---- texts copied from the source repositories -------------------------------------------------------
+
+# The egui crates list LICENSE-MIT and LICENSE-APACHE in their package, but those files sit at the top of the
+# repository, outside the crate folders, so cargo leaves them out.
+[[source]]
+crates = ["ecolor", "eframe", "egui", "egui-winit", "egui_glow", "emath", "epaint", "epaint_default_fonts"]
+url = "https://github.com/emilk/egui/tree/0.37.0"
+files = ["upstream/egui/LICENSE-MIT", "upstream/egui/LICENSE-APACHE"]
+
+[[source]]
+crates = ["accesskit"]
+url = "https://github.com/AccessKit/accesskit/tree/ce8164ba92995cfa86005b6259115e08c8244253"
+files = ["upstream/accesskit/LICENSE-MIT", "upstream/accesskit/LICENSE-APACHE"]
+
+[[source]]
+crates = ["profiling"]
+url = "https://github.com/aclysma/profiling/tree/8271551172eb6fa4cba47369aedd93790c623df9"
+files = ["upstream/profiling/LICENSE-MIT", "upstream/profiling/LICENSE-APACHE"]
+
+[[source]]
+crates = ["gl_generator"]
+url = "https://github.com/brendanzab/gl-rs/tree/ea503e8d5fb6d73c6030e6191ce738cd3bf3433e"
+files = ["upstream/gl-rs/LICENSE"]
+
+[[source]]
+crates = ["khronos_api"]
+url = "https://github.com/brendanzab/gl-rs/tree/f150967b1c44ae888e6676f93f639ebc82771bdc"
+files = ["upstream/gl-rs/LICENSE"]
+
+# The older objc2 crates (the ones with MIT only) come with the license file of the repository (the same text
+# at the commit of each of them).
+[[source]]
+crates = ["block2@0.5.1", "objc-sys", "objc2@0.5.3", "objc2-app-kit@0.2.2", "objc2-foundation@0.2.2"]
+url = "https://github.com/madsmtm/objc2/tree/4fc083f1c6d6784577e38b0ee8dbd344481e2fd2"
+files = ["upstream/objc2-old/LICENSE.txt"]
+
+# The newer ones were published when the repository had only a LICENSE.md that points to the MIT text
+# elsewhere; the repository has the full text now.
+[[source]]
+crates = [
+    "block2@0.6.2", "dispatch2", "objc2@0.6.5", "objc2-app-kit@0.3.2", "objc2-core-foundation",
+    "objc2-encode", "objc2-foundation@0.3.2",
+]
+url = "https://github.com/madsmtm/objc2/tree/main"
+files = ["upstream/objc2/LICENSE-MIT.txt", "upstream/objc2/LICENSE.md"]
+
+# ---- no text published anywhere ----------------------------------------------------------------------
+
+# The standard text of the license, with the author named in Cargo.toml.
+[[standard]]
+crates = ["dispatch"]
+license = "MIT"
+holder = "Steven Sheldon"
+reason = "Its Cargo.toml says MIT and names Steven Sheldon as the author, but neither the package nor the repository has a license file."
+
+# ---- files of a package that the file names do not reveal ---------------------------------------------
+
+# The fonts inside egui (Hack, Ubuntu Light, Noto Emoji, emoji-icon-font) keep their licenses next to them.
+[[package_files]]
+crate = "epaint_default_fonts"
+files = [
+    "fonts/Hack-Regular.txt",
+    "fonts/UFL.txt",
+    "fonts/OFL.txt",
+    "fonts/emoji-icon-font-mit-license.txt",
+]
+
+# ---- choices -------------------------------------------------------------------------------------------
+
+# Where a library offers a choice of licenses ("MIT OR Apache-2.0"), generate.py uses it under one of them and
+# leaves out the texts of the others. That choice needs no entry here.
+
+# Texts of copyleft licenses are never included by accident: a library must be listed here.
+[[allow_copyleft]]
+crate = "wayland-protocols-plasma"
+reason = "It bundles protocol descriptions from KDE's plasma-wayland-protocols, which have their own licenses."
+
+# ---- notes printed under the table of libraries ------------------------------------------------------------
+
+[[note]]
+crate = "epaint_default_fonts"
+text = "Contains the fonts Hack, Ubuntu Light, Noto Emoji and emoji-icon-font, which egui uses for symbols and emoji. Their licenses are listed below with this library."
+
+[[note]]
+crate = "khronos_api"
+text = "Bundles the OpenGL API registry (gl.xml), Copyright (c) 2013-2018 The Khronos Group Inc., under the Apache License 2.0."
+
+[[note]]
+crate = "wayland-protocols-plasma"
+text = "Bundles the protocol descriptions of KDE's plasma-wayland-protocols, whose files carry their own licenses (listed below with this library)."
+
+[[note]]
+crate = "objc2"
+text = "The objc2 crates are derived from Apple SDKs; their repository explains what that means for their license (the LICENSE.md text below)."

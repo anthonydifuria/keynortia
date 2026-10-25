@@ -63,7 +63,8 @@ assets = [
     ["packaging/keynortia.desktop", "usr/share/applications/", "644"],
     ["assets/icon.png", "usr/share/icons/hicolor/256x256/apps/keynortia.png", "644"],
     ["README.md", "usr/share/doc/keynortia/", "644"],
-    # the fonts built into the program ask for their licence to travel with it
+    # the libraries and the fonts built into the program ask for their licences to travel with it
+    ["THIRD-PARTY-LICENSES.md", "usr/share/doc/keynortia/licenses/", "644"],
     ["assets/fonts/OFL-Cinzel.txt", "usr/share/doc/keynortia/licenses/", "644"],
     ["assets/fonts/OFL-IBMPlexMono.txt", "usr/share/doc/keynortia/licenses/", "644"],
     ["assets/fonts/OFL-NotoSansOldItalic.txt", "usr/share/doc/keynortia/licenses/", "644"],
@@ -77,7 +78,8 @@ assets = [
     { source = "assets/icon.png", dest = "/usr/share/icons/hicolor/256x256/apps/keynortia.png", mode = "0644" },
     { source = "LICENSE", dest = "/usr/share/licenses/keynortia/LICENSE", mode = "0644", doc = true },
     { source = "README.md", dest = "/usr/share/doc/keynortia/README.md", mode = "0644", doc = true },
-    # the fonts built into the program ask for their licence to travel with it
+    # the libraries and the fonts built into the program ask for their licences to travel with it
+    { source = "THIRD-PARTY-LICENSES.md", dest = "/usr/share/licenses/keynortia/THIRD-PARTY-LICENSES.md", mode = "0644", doc = true },
     { source = "assets/fonts/OFL-Cinzel.txt", dest = "/usr/share/licenses/keynortia/OFL-Cinzel.txt", mode = "0644", doc = true },
     { source = "assets/fonts/OFL-IBMPlexMono.txt", dest = "/usr/share/licenses/keynortia/OFL-IBMPlexMono.txt", mode = "0644", doc = true },
     { source = "assets/fonts/OFL-NotoSansOldItalic.txt", dest = "/usr/share/licenses/keynortia/OFL-NotoSansOldItalic.txt", mode = "0644", doc = true },
