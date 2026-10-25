@@ -101,14 +101,18 @@ jobs:
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           useradd --create-home builder
+          # makepkg installs the dependencies of the package with sudo
+          echo 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder
+          chmod 0440 /etc/sudoers.d/builder
           build=/tmp/arch-build
           mkdir -p "$build" dist
           # the same file that the PKGBUILD would download, made from this checkout
           git archive --format=tar.gz --prefix="keynortia-$VERSION/" --output="$build/keynortia-$VERSION.tar.gz" HEAD
           sed "s/^pkgver=.*/pkgver=$VERSION/" packaging/arch/PKGBUILD > "$build/PKGBUILD"
           chown -R builder "$build"
-          # no checksums (the source is the file just made) and no tests (CI has run them)
-          su builder -c "cd $build && makepkg --noconfirm --skipinteg --nocheck"
+          # --syncdeps installs the dependencies of the package; no checksums (the source is the file
+          # just made) and no tests (CI has run them)
+          su builder -c "cd $build && makepkg --noconfirm --syncdeps --skipinteg --nocheck"
           cp "$build"/*.pkg.tar.* dist/
           ls -l dist
 
