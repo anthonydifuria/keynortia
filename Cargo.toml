@@ -1,0 +1,87 @@
+[package]
+name = "keynortia"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Turns the computer keyboard into a MIDI instrument: piano and button accordion"
+license = "MIT"
+repository = "https://github.com/anthonydifuria/keynortia"
+readme = "README.md"
+keywords = ["midi", "keyboard", "piano", "accordion"]
+categories = ["multimedia::audio"]
+
+[dependencies]
+eframe = { version = "0.37", default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }
+midir = "0.11"
+
+# Each keyboard is read separately, and every system has its own way to do it:
+# Linux: evdev
+[target.'cfg(target_os = "linux")'.dependencies]
+evdev = "0.13"
+libc = "0.2"
+
+# Windows: Raw Input and a keyboard hook
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = [
+    "Win32_Devices_HumanInterfaceDevice",
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_Security",
+    "Win32_Storage_FileSystem",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Threading",
+    "Win32_UI_Input",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+# macOS: IOHID (IOKit)
+[target.'cfg(target_os = "macos")'.dependencies]
+core-foundation = "0.10"
+core-foundation-sys = "0.8"
+
+[profile.release]
+# the symbols are of no use to the user, and the program is a few MB smaller without them
+strip = true
+
+# `cargo deb`: the package for Debian, Ubuntu and the like (needs a release build first)
+[package.metadata.deb]
+maintainer = "Anthony Di Furia <anthonydifuria@users.noreply.github.com>"
+copyright = "2026, Anthony Di Furia"
+license-file = ["LICENSE", "0"]
+section = "sound"
+priority = "optional"
+depends = "$auto"
+# the graphics and windowing libraries are loaded when the program starts: any desktop has them
+recommends = "libgl1, libegl1, libxkbcommon-x11-0, libwayland-client0"
+extended-description = """\
+Keynortia turns the computer keyboard into a MIDI instrument: a piano or a button accordion, \
+with a fixed layout on 45 small keys. Each keyboard can play its own instrument, and can be \
+made exclusive so that its keys only play. The notes go out through a virtual MIDI port \
+called "Keynortia"."""
+assets = [
+    ["target/release/keynortia", "usr/bin/", "755"],
+    ["packaging/keynortia.desktop", "usr/share/applications/", "644"],
+    ["assets/icon.png", "usr/share/icons/hicolor/256x256/apps/keynortia.png", "644"],
+    ["README.md", "usr/share/doc/keynortia/", "644"],
+    # the fonts built into the program ask for their licence to travel with it
+    ["assets/fonts/OFL-Cinzel.txt", "usr/share/doc/keynortia/licenses/", "644"],
+    ["assets/fonts/OFL-IBMPlexMono.txt", "usr/share/doc/keynortia/licenses/", "644"],
+    ["assets/fonts/OFL-NotoSansOldItalic.txt", "usr/share/doc/keynortia/licenses/", "644"],
+]
+
+# `cargo generate-rpm`: the package for Fedora, openSUSE and the like (needs a release build first)
+[package.metadata.generate-rpm]
+assets = [
+    { source = "target/release/keynortia", dest = "/usr/bin/keynortia", mode = "0755" },
+    { source = "packaging/keynortia.desktop", dest = "/usr/share/applications/keynortia.desktop", mode = "0644" },
+    { source = "assets/icon.png", dest = "/usr/share/icons/hicolor/256x256/apps/keynortia.png", mode = "0644" },
+    { source = "LICENSE", dest = "/usr/share/licenses/keynortia/LICENSE", mode = "0644", doc = true },
+    { source = "README.md", dest = "/usr/share/doc/keynortia/README.md", mode = "0644", doc = true },
+    # the fonts built into the program ask for their licence to travel with it
+    { source = "assets/fonts/OFL-Cinzel.txt", dest = "/usr/share/licenses/keynortia/OFL-Cinzel.txt", mode = "0644", doc = true },
+    { source = "assets/fonts/OFL-IBMPlexMono.txt", dest = "/usr/share/licenses/keynortia/OFL-IBMPlexMono.txt", mode = "0644", doc = true },
+    { source = "assets/fonts/OFL-NotoSansOldItalic.txt", dest = "/usr/share/licenses/keynortia/OFL-NotoSansOldItalic.txt", mode = "0644", doc = true },
+]
+
+[package.metadata.generate-rpm.requires]
+alsa-lib = "*"

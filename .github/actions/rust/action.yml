@@ -1,0 +1,29 @@
+name: Rust toolchain
+description: Installs the stable Rust toolchain, with clippy and rustfmt, and any extra targets
+
+inputs:
+  targets:
+    description: Extra targets, separated by spaces
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Install Rust
+      shell: bash
+      env:
+        TARGETS: ${{ inputs.targets }}
+      run: |
+        if ! command -v rustup > /dev/null 2>&1; then
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain none
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.cargo/bin:$PATH"
+        fi
+        rustup toolchain install stable --profile minimal --component clippy --component rustfmt --no-self-update
+        rustup default stable
+        for target in $TARGETS; do
+          rustup target add "$target"
+        done
+        rustc --version
+        cargo --version

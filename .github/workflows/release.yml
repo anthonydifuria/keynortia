@@ -1,0 +1,225 @@
+name: Release
+
+# Pushing a tag such as v0.1.0 builds Keynortia for every system and publishes a release with the
+# files. "Run workflow" by hand builds everything but publishes nothing: a way to try this out.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  meta:
+    name: Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Read the version and check it against the tag
+        id: version
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -n 1)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::The tag $GITHUB_REF_NAME does not match the version $version in Cargo.toml"
+            exit 1
+          fi
+
+  linux:
+    name: Linux ${{ matrix.arch }}
+    needs: meta
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # the oldest system with a runner: what is built here runs on newer ones too
+          - { arch: x86_64, os: ubuntu-22.04 }
+          - { arch: aarch64, os: ubuntu-22.04-arm }
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install the system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev pkg-config
+
+      - uses: ./.github/actions/rust
+
+      - name: Build
+        run: cargo build --release --locked
+
+      - name: Install the tools that make the packages
+        run: cargo install --locked cargo-deb cargo-generate-rpm
+
+      - name: Make the packages
+        run: |
+          mkdir dist
+          cargo deb --no-build
+          cp target/debian/*.deb dist/
+          cargo generate-rpm
+          cp target/generate-rpm/*.rpm dist/
+
+          name="keynortia-$VERSION-linux-${{ matrix.arch }}"
+          mkdir "dist/$name"
+          cp target/release/keynortia LICENSE README.md packaging/keynortia.desktop "dist/$name/"
+          cp assets/icon.png "dist/$name/keynortia.png"
+          mkdir "dist/$name/licenses"
+          cp assets/fonts/OFL-*.txt "dist/$name/licenses/"
+          tar -C dist -czf "dist/$name.tar.gz" "$name"
+          rm -r "dist/$name"
+          ls -l dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: linux-${{ matrix.arch }}
+          path: dist/*
+
+  arch:
+    name: Arch Linux
+    needs: meta
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+    steps:
+      - name: Install the tools
+        run: pacman -Syu --noconfirm --needed base-devel git rust alsa-lib
+
+      - uses: actions/checkout@v6
+
+      - name: Build the package
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          useradd --create-home builder
+          build=/tmp/arch-build
+          mkdir -p "$build" dist
+          # the same file that the PKGBUILD would download, made from this checkout
+          git archive --format=tar.gz --prefix="keynortia-$VERSION/" --output="$build/keynortia-$VERSION.tar.gz" HEAD
+          sed "s/^pkgver=.*/pkgver=$VERSION/" packaging/arch/PKGBUILD > "$build/PKGBUILD"
+          chown -R builder "$build"
+          # no checksums (the source is the file just made) and no tests (CI has run them)
+          su builder -c "cd $build && makepkg --noconfirm --skipinteg --nocheck"
+          cp "$build"/*.pkg.tar.* dist/
+          ls -l dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: arch-x86_64
+          path: dist/*
+
+  windows:
+    name: Windows x86_64
+    needs: meta
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/rust
+
+      - name: Build
+        run: cargo build --release --locked
+
+      - name: Make the zip
+        shell: pwsh
+        run: |
+          $name = "keynortia-$env:VERSION-windows-x86_64"
+          New-Item -ItemType Directory -Path "dist/$name/licenses" | Out-Null
+          Copy-Item target/release/keynortia.exe, LICENSE, README.md -Destination "dist/$name"
+          Copy-Item assets/fonts/OFL-*.txt -Destination "dist/$name/licenses"
+          Compress-Archive -Path "dist/$name" -DestinationPath "dist/$name.zip"
+          Remove-Item -Recurse "dist/$name"
+          Get-ChildItem dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows-x86_64
+          path: dist/*.zip
+
+  macos:
+    name: macOS
+    needs: meta
+    runs-on: macos-latest
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+      # what the program needs to run: macOS 11 (Big Sur) or later
+      MACOSX_DEPLOYMENT_TARGET: "11.0"
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/rust
+        with:
+          targets: aarch64-apple-darwin x86_64-apple-darwin
+
+      - name: Build for Apple silicon and for Intel, and join the two
+        run: |
+          cargo build --release --locked --target aarch64-apple-darwin
+          cargo build --release --locked --target x86_64-apple-darwin
+          lipo -create -output keynortia-universal \
+            target/aarch64-apple-darwin/release/keynortia \
+            target/x86_64-apple-darwin/release/keynortia
+          lipo -info keynortia-universal
+
+      - name: Make the app and the disk image
+        run: |
+          mkdir dist
+          bash packaging/macos/bundle.sh keynortia-universal "$VERSION" dist
+          ls -l dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: macos
+          path: dist/*.dmg
+
+  publish:
+    name: Publish the release
+    needs: [meta, linux, arch, windows, macos]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums and release notes
+        run: |
+          (cd dist && sha256sum -- * > /tmp/SHA256SUMS)
+          mv /tmp/SHA256SUMS dist/
+          cat dist/SHA256SUMS
+          sed "s/@VERSION@/$VERSION/g" .github/release-notes.md > notes.md
+
+      - name: Publish
+        run: |
+          prerelease=""
+          case "$VERSION" in *-*) prerelease="--prerelease" ;; esac
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            # the workflow has been run again: replace the files
+            gh release upload "$GITHUB_REF_NAME" dist/* --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$GITHUB_REF_NAME" dist/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "Keynortia $VERSION" \
+              --notes-file notes.md \
+              --generate-notes \
+              --verify-tag \
+              $prerelease
+          fi

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Keynortia
+GenericName=Keyboard MIDI instrument
+Comment=Play a piano or a button accordion on your computer keyboard
+Exec=keynortia
+Icon=keynortia
+Terminal=false
+Categories=AudioVideo;Audio;Midi;Music;
+Keywords=midi;piano;accordion;keyboard;synthesizer;
+StartupWMClass=keynortia

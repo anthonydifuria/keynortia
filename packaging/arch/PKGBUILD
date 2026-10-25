@@ -1,0 +1,48 @@
+# Maintainer: Anthony Di Furia <anthonydifuria@users.noreply.github.com>
+#
+# Builds Keynortia from the source of a release. To try it from a checkout of the repository:
+#   cd packaging/arch && makepkg -si
+# (the release workflow builds this same file in an Arch container and attaches the package to the release)
+
+pkgname=keynortia
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Turns the computer keyboard into a MIDI instrument: piano and button accordion'
+arch=('x86_64' 'aarch64')
+url='https://github.com/anthonydifuria/keynortia'
+license=('MIT')
+depends=('alsa-lib' 'libgl' 'libxkbcommon-x11' 'libx11' 'libxcursor' 'libxi' 'libxrandr' 'wayland')
+makedepends=('cargo')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+# Before publishing to the AUR replace SKIP with the real checksum (updpkgsums does it).
+sha256sums=('SKIP')
+
+prepare() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo build --frozen --release
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo test --frozen
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  install -Dm755 target/release/keynortia "$pkgdir/usr/bin/keynortia"
+  install -Dm644 packaging/keynortia.desktop "$pkgdir/usr/share/applications/keynortia.desktop"
+  install -Dm644 assets/icon.png "$pkgdir/usr/share/icons/hicolor/256x256/apps/keynortia.png"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  # the licences of the fonts built into the program
+  install -Dm644 -t "$pkgdir/usr/share/licenses/$pkgname" assets/fonts/OFL-*.txt
+  install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+}
