@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <a href="https://anthonydifuria.github.io/keynortia/">Website</a> ·
+  <a href="https://www.anthonydifuria.com/keynortia/">Website</a> ·
   <a href="https://github.com/anthonydifuria/keynortia/releases/latest">Download</a> ·
   <a href="#manual">Manual</a>
 </p>
